@@ -26,7 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.SwingConstants;
 
-import domain.Offer;
+import domain.*;
+import businessLogic.*;
+import DataAccess.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -310,35 +312,44 @@ public class OfferBooking extends JFrame {
 			bookOffer.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					int num = 0;
-					boolean error = false;
-					if (tripleRooms.isSelected()) {
-						num = selectedOffer.getTripleNumber();
-						if (num > 0)
-							selectedOffer.setTripleNumber(num - 1);
-						else
-							error = true;
-					} else if (doubleRooms.isSelected()) {
-						num = selectedOffer.getDoubleNumber();
-						if (num > 0)
-							selectedOffer.setDoubleNumber(num - 1);
-						else
-							error = true;
-					} else if (singleRooms.isSelected()) {
-						num = selectedOffer.getSingleNumber();
-						if (num > 0)
-							selectedOffer.setSingleNumber(num - 1);
-						else
-							error = true;
+					int id=0;
+					boolean error=false;
+					if (tripleRooms.isSelected()) { 
+						num=selectedOffer.getTripleNumber();
+						if (num>0){
+							id=selectedOffer.getNumOffer();
+							businessLogic.modifyRoom(id, 3);
+							selectedOffer.setTripleNumber(num-1);  
+						}else error=true;
+						}
+						
+					else if (doubleRooms.isSelected()) {
+						num=selectedOffer.getDoubleNumber();
+						if (num>0){ 
+							id=selectedOffer.getNumOffer();
+							businessLogic.modifyRoom(id, 2);
+							selectedOffer.setDoubleNumber(num-1); 
+							} else error=true;
 					}
-					if (error)
-						bookOffer.setText("No available offer for that room type");
-					else
-						bookOffer.setText("Booked. #rooms left: " + (num - 1));
+					else if (singleRooms.isSelected()) {
+						num=selectedOffer.getSingleNumber();
+						if (num>0){
+							id=selectedOffer.getNumOffer();
+							businessLogic.modifyRoom(id, 1);
+							selectedOffer.setSingleNumber(num-1); 
+						}else error=true;
+					}
+					if (error) {
+						bookOffer.setText("Error: There were no offers available!");
+						bookOffer.setEnabled(false);
+					}
+					else bookOffer.setText("Booked. #rooms left: "+(num-1));
 					bookOffer.setEnabled(false);
 				}
 			});
 		}
 		return bookOffer;
+	
 	}
 
 	public static void main(String[] args) {
@@ -407,3 +418,4 @@ public class OfferBooking extends JFrame {
 	}
 	
 } // @jve:decl-index=0:visual-constraint="18,9"
+

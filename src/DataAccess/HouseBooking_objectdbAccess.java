@@ -1,69 +1,108 @@
 package DataAccess;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
-
-import java.util.Date;
-import java.util.List;
-
-import domain.*;
-import businessLogic.*;
-import presentation.*;
+import domain.Offer;
+import domain.RuralHouse;
 
 public class HouseBooking_objectdbAccess {
+
 	private EntityManager db;
 	private EntityManagerFactory emf;
-	String fileName = "ruralHousesDB.odb";
+	String fileName = "RuralHouses.odb";
 
 	public HouseBooking_objectdbAccess() {
+
 		emf = Persistence.createEntityManagerFactory("objectdb:" + fileName);
 		db = emf.createEntityManager();
-		System.out.println("Base de datos abierta");
 	}
 
 	public void close() {
 		db.close();
-		System.out.println("Base de datos cerrada");
-	}
-	// como el labo de objectbd
-
-	// Añadir casa a la base de datos
-
-	public RuralHouse storeHouse(String city, String address) {
-		db.getTransaction().begin();
-		RuralHouse house = new RuralHouse(city, address);
-		db.persist(house);
-		db.getTransaction().commit();
-		System.out.println("Insertado: " + house);
-		return house;
 	}
 
-	// añadir nueva oferta a la base de datos
+	public RuralHouse getHouseId(int id) {
+		TypedQuery<RuralHouse> query = db.createQuery("SELECT p FROM RuralHouse p WHERE p.houseNumber=" + id,
+				RuralHouse.class);
+
+		RuralHouse rh = query.getSingleResult();
+
+		return rh;
+	}
+
+	public void deleteHouses() {
+		TypedQuery<RuralHouse> query = db.createQuery("DELETE rh FROM RuralHouse rh", RuralHouse.class);
+	}
+
+	public void lookOffers(RuralHouse rb) {
+		List<Offer> of = (List<Offer>) rb.getOffers();
+		for (Offer o : of) {
+			System.out.println(o.toString());
+		}
+	}
 
 	public void storeOffer(Date date, int tripleNumber, int doubleNumber, int singleNumber, RuralHouse rh) {
 		db.getTransaction().begin();
-		Offer oferta = new Offer(date, tripleNumber, doubleNumber, singleNumber, rh);
-		rh.add(oferta);
-		db.persist(oferta);
+		Offer o = new Offer(date, tripleNumber, doubleNumber, singleNumber, rh);
+		rh.add(o);
+		db.persist(o);
 		db.getTransaction().commit();
-		System.out.println("Insertado: " + oferta);
-
 	}
-
-	// sacar todas las casas de la base de datos
 
 	public List<RuralHouse> getAllHouses() {
 		TypedQuery<RuralHouse> query = db.createQuery("SELECT rh FROM RuralHouse rh", RuralHouse.class);
 		List<RuralHouse> rh = query.getResultList();
 		System.out.println("Contenido de la base de datos:");
-		for (RuralHouse casa : rh)
-			System.out.println(casa.toString());
-
+		for (RuralHouse r : rh)
+			System.out.println(r.toString());
 		return rh;
 	}
 
+	public void setRoom(Offer idO, int valor) {
+		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+		System.out.println("idO.getNumOffer: " + idO.getNumOffer());
+		Offer o = db.find(Offer.class, idO.getNumOffer());
+		System.out.println("o.getNumOffer: " + o.getNumOffer());
+		db.getTransaction().begin();
+		int cont = 0;
+		switch (valor) {
+		case 1: {
+			System.out.println("o.getsingleNumber: " + o.getSingleNumber());
+			cont = idO.getSingleNumber();
+			o.setSingleNumber(cont - 1);
+
+			break;
+		}
+		case 2: {
+			cont = idO.getDoubleNumber();
+			idO.setDoubleNumber(cont - 1);
+			break;
+		}
+		case 3: {
+			cont = idO.getTripleNumber();
+			idO.setTripleNumber(cont - 1);
+			break;
+		}
+		default:
+			break;
+		}
+		db.getTransaction().commit();
+		o = db.find(Offer.class, idO.getNumOffer());
+
+	}
+
+	public RuralHouse storeHouse(String city, String address, int n) {
+		db.getTransaction().begin();
+		RuralHouse rh = new RuralHouse(city, address, n);
+		db.persist(rh);
+		db.getTransaction().commit();
+		System.out.println("stored:" + rh);
+		return rh;
+	}
 }

@@ -3,6 +3,10 @@ package domain;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+@Entity
 public class Offer {
 
 private Date date;
@@ -10,6 +14,11 @@ private Date date;
 private int tripleNumber;
 private int doubleNumber;
 private int singleNumber;
+
+@Id
+@GeneratedValue
+private int numOffer;
+
 private RuralHouse rh;
 
 public Offer(Date date, int tripleNumber, int doubleNumber, int singleNumber, RuralHouse rh) {
@@ -48,7 +57,13 @@ public void setSingleNumber(int singleNumber) {
 
 public String toString() {
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-	return rh.toString()+"/ "+df.format(date);}
+	return rh.toString()+"/ "+df.format(date);
+	}
+
+//---
+public int getNumOffer(){
+	return numOffer;
+}
 }
 
 

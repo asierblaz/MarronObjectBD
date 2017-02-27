@@ -11,4 +11,8 @@ import domain.Offer;
 public interface OfferManager {
 	@WebMethod
 	Collection<Offer> getConcreteOffers(String city, Date date);
+	@WebMethod
+	public void modifyRoom(int n, int ha);
+	@WebMethod
+	public void removeOffer();
 }
